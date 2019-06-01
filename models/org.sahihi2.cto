@@ -1,0 +1,188 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.sahihi2
+
+/**
+ * The types of commodities that could be tracked
+*/
+enum CommodityType {
+  o TOMATOES
+  o ONIONS
+  o ORANGES
+  
+}
+
+/**
+ * The movement status for a commodity
+ */
+enum CommodityStatus {
+  //o CREATED
+  o RECEIVED
+  o IN_TRANSIT
+}
+
+/**
+ * Quantity of commodity 
+ */
+enum UnitType {
+  o GRAMS
+  o KILOGRAMS
+    
+}
+
+/**
+ * Activity to be carried out on commodity
+ */
+enum ActivityType {
+	o PURCHASE_ORDER
+  
+}
+
+
+concept CommodityDate {
+  
+  o String packagingDate optional 
+  o String expirationDate optional 
+  o String sellByDate optional 
+}
+
+abstract participant Member identified by tradeCode {
+  o String tradeCode
+  o String address
+  o String firstname optional
+  o String lastname optional
+
+}
+
+/**
+ * Participant farmer
+ */
+participant Farmer extends Member {
+  
+  o String farmName  
+  
+}
+
+/**
+ * Participant retailer
+ */
+participant Retailer extends Member {
+  
+}
+
+/**
+ * Participant consumer
+ */
+participant Consumer extends Member{
+}
+
+/**
+ * Participant distributor
+ */
+participant Distributor extends Member{
+}
+
+
+/**
+ * Asset of the contract(the purchase receipt) binding the commodity to be transferred
+ */
+asset CommodityContract identified by contractId {
+  o String contractId
+  --> Farmer farmer
+  //--> Retailer retailer
+  --> Consumer consumer
+  o String activity
+  o String commodity
+}
+
+/**
+ * Asset of the commodity being transferred
+ */
+asset CommodityShipment identified by gtin {
+  o String gtin 
+  --> CommodityContract contract
+  o String lotSerial
+  o String packagingDate
+  o String expirationDate
+  o String sellByDate
+  o String quantity
+  o String unit
+  o CommodityStatus status
+  o String lng optional
+  o String lat optional
+  o String city optional
+  o String time optional
+  --> Distributor distributor
+
+}
+
+/**
+ * Transaction to start network to prevent manual entry
+ */
+transaction BootstrapNetwork {
+}
+
+
+transaction CreateContract {
+  o String contractId
+  --> Consumer consumer
+  //--> Retailer retailer
+  --> Farmer farmer
+  o String activity
+  o String commodity
+}
+
+transaction CreateCommodityShipment {
+	--> CommodityContract contract
+  o String gtin 
+  o String lotSerial
+  o String packagingDate
+  o String expirationDate
+  o String sellByDate
+  o String quantity
+  o String unit
+  o String lng optional
+  o String lat optional
+  o String city optional
+  o String time optional
+  --> Distributor distributor
+}
+
+transaction UpdateLocation{
+  --> CommodityShipment commodityshipment
+  o String lat
+  o String lng
+  o String city
+  o String time
+}
+  
+
+transaction ShipCommodity {
+  --> CommodityShipment commodityshipment
+  --> Member to
+  --> Member from
+  //--> Distributor distributor
+  
+}
+
+transaction ReceiveCommodity {
+	--> CommodityShipment commodityshipment
+}
+
+

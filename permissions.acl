@@ -1,0 +1,350 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Sample access control list.
+ */
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+
+rule NetworkAdminUser {
+  description: "Grant business network administrators full access to user resources"
+  participant: "org.hyperledger.composer.system.NetworkAdmin"
+  operation: ALL
+  resource: "**"
+  action: ALLOW
+}
+
+rule NetworkAdminSystem {
+  description: "Grant business network administrators full access to system resources"
+  participant: "org.hyperledger.composer.system.NetworkAdmin"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+
+/** 
+rule CanSeeOwnShipment {
+  description: "Participants can only see shipments which they are a part of"
+  participant(p): "org.sahihi2.Member"
+  operation: ALL
+  resource(r): "org.sahihi2.CommodityShipment"
+  condition: (r.contract.farmer.getIdentifier() !== p.getIdentifier() && r.contract.retailer.getIdentifier() !== p.getIdentifier() && r.contract.consumer.getIdentifier() !== p.getIdentifier())
+  action: DENY
+}
+*/
+
+
+//Consumer permissions
+rule ConsumerCanCreateContract{
+  description: "Consumer can create contract"
+  participant: "org.sahihi2.Consumer"
+  operation: CREATE
+  resource: "org.sahihi2.CommodityContract"
+  action: ALLOW
+}
+
+rule ConsumerCanCreateContracttx{
+  description: "Consumer can create contract"
+  participant: "org.sahihi2.Consumer"
+  operation: CREATE
+  resource: "org.sahihi2.CreateContract"
+  action: ALLOW
+}
+
+
+rule ConsumerCanSeeOwnContract{
+  description: "Consumer can only see contract they are involved in"
+  participant(p): "org.sahihi2.Consumer"
+  operation: READ
+  resource(r): "org.sahihi2.CommodityContract"
+  condition: (r.consumer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+
+rule ConsumerCannotCreateShipment {
+  description: "Consumer cannot create shipment"
+  participant: "org.sahihi2.Consumer"
+  operation: CREATE, DELETE
+  resource: "org.sahihi2.CreateCommodityShipment"
+  action: DENY
+}
+
+
+rule ConsumerCannotShipCommodity{
+  description: "Consumer cannot ship commodity"
+  participant: "org.sahihi2.Consumer"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.ShipCommodity"
+  action: DENY
+}
+
+
+rule ConsumerCanSeeOwnShipment{
+  description: "Consumer can only see shipments they are involved in"
+  participant(p): "org.sahihi2.Consumer"
+  operation: READ, UPDATE, CREATE
+  resource(r): "org.sahihi2.CommodityShipment"
+  condition: (r.contract.consumer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+
+rule ConsumerReceivesOwnShipment {
+  description: "Consumer receives shipment"
+  participant(p): "org.sahihi2.Consumer"
+  operation: CREATE,READ,UPDATE
+  resource(r): "org.sahihi2.CommodityShipment"
+  condition: (r.commodityshipment.contract.consumer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+
+}
+
+
+rule ConsumerReceivesOwnShipmenttx {
+  description: "Consumer receives shipment"
+  participant(p): "org.sahihi2.Consumer"
+  operation: CREATE,READ,UPDATE
+  resource(r): "org.sahihi2.ReceiveCommodity"
+  condition: (r.commodityshipment.contract.consumer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+
+}
+
+
+//Farmer permissions
+rule FarmerCannotCreateContract{
+  description: "Consumer can create contract"
+  participant: "org.sahihi2.Consumer"
+  operation: CREATE
+  resource: "org.sahihi2.CommodityContract"
+  action: DENY
+}
+
+
+rule FarmerCanSeeOwnContract{
+  description: "Farmer can only see contract they are involved in"
+  participant(p): "org.sahihi2.Farmer"
+  operation: READ
+  resource(r): "org.sahihi2.CommodityContract"
+  condition: (r.farmer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+
+rule FarmerCreatesCommodityShipment {
+  description: "Farmer creates Commodity Shipment"
+  participant: "org.sahihi2.Farmer"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.CreateCommodityShipment"
+  action: ALLOW
+}
+
+rule FarmerCreatesCommodityShipmenttx {
+  description: "Farmer creates Commodity Shipment"
+  participant: "org.sahihi2.Farmer"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.CommodityShipment"
+  action: ALLOW
+}
+
+
+rule FarmerCanSeeOwnShipment{
+  description: "Farmer can only see shipments they are involved in"
+  participant(p): "org.sahihi2.Farmer"
+  operation: READ
+  resource(r): "org.sahihi2.CommodityShipment"
+  condition: (r.contract.farmer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+rule FarmerShipsCommodity {
+  description: "Farmer creates Commodity Shipment"
+  participant: "org.sahihi2.Farmer"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.CommodityShipment"
+  action: ALLOW
+}
+
+rule FarmerShipsCommoditytx {
+  description: "Farmer creates Commodity Shipment"
+  participant: "org.sahihi2.Farmer"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.ShipCommodity"
+  action: ALLOW
+}
+
+
+//Distributor permissions
+
+rule DistributorCannotCreateContract{
+  description: "Distributor cannot create contract"
+  participant: "org.sahihi2.Distributor"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.CreateContract"
+  action: DENY
+}
+
+rule DistributorCannotCreateShipment {
+  description: "Distributor cannot create shipment"
+  participant: "org.sahihi2.Distributor"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.CreateCommodityShipment"
+  action: DENY
+}
+
+rule DistributorCannotShipCommodity{
+  description: "Distributor cannot ship commodity"
+  participant: "org.sahihi2.Distributor"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.ShipCommodity"
+  action: DENY
+}
+
+
+
+rule DistributorCannotReceiveCommodity{
+  description: "Distributor cannot ship give command to ship commodity"
+  participant: "org.sahihi2.Distributor"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.ReceiveCommodity"
+  action: DENY
+}
+
+
+
+//Retailer permisiions
+rule RetailerCanCreateContract{
+  description: "Retailer can create contract"
+  participant: "org.sahihi2.Retailer"
+  operation: CREATE
+  resource: "org.sahihi2.CommodityContract"
+  action: ALLOW
+}
+
+rule RetailerCanCreateContracttx{
+  description: "Retailer can create contract"
+  participant: "org.sahihi2.Retailer"
+  operation: CREATE
+  resource: "org.sahihi2.CreateContract"
+  action: ALLOW
+}
+
+
+rule RetailerCanSeeOwnContract{
+  description: "Retailer can only see contract they are involved in"
+  participant(p): "org.sahihi2.Retailer"
+  operation: READ
+  resource(r): "org.sahihi2.CommodityContract"
+  condition: (r.retailer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+
+rule RetailerCannotCreateShipment {
+  description: "Retailer cannot create shipment"
+  participant: "org.sahihi2.Retailer"
+  operation: CREATE, DELETE
+  resource: "org.sahihi2.CreateCommodityShipment"
+  action: DENY
+}
+
+
+rule RetailerCannotShipCommodity{
+  description: "Retailer cannot ship commodity"
+  participant: "org.sahihi2.Retailer"
+  operation: CREATE, DELETE, UPDATE
+  resource: "org.sahihi2.ShipCommodity"
+  action: DENY
+}
+
+
+rule RetailerCanSeeOwnShipment{
+  description: "Retailer can only see shipments they are involved in"
+  participant(p): "org.sahihi2.Retailer"
+  operation: READ, UPDATE, CREATE
+  resource(r): "org.sahihi2.CommodityShipment"
+  condition: (r.contract.retailer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+
+rule RetailerReceivesOwnShipment {
+  description: "Retailer receives shipment"
+  participant(p): "org.sahihi2.Retailer"
+  operation: CREATE,READ,UPDATE
+  resource(r): "org.sahihi2.CommodityShipment"
+  condition: (r.commodityshipment.contract.retailer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+
+}
+
+
+rule RetailerReceivesOwnShipmenttx {
+  description: "Retailer receives shipment"
+  participant(p): "org.sahihi2.Retailer"
+  operation: CREATE,READ,UPDATE
+  resource(r): "org.sahihi2.ReceiveCommodity"
+  condition: (r.commodityshipment.contract.retailer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
