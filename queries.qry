@@ -36,6 +36,11 @@ query selectDistributors {
       SELECT org.sahihi2.Distributor
 }
 
+query getHistorianRecords {
+  description: "get all Historian records"
+  statement: SELECT org.hyperledger.composer.system.HistorianRecord
+
+}
 // query selectContracts {
 //   description: "Select all contracts"
 //   statement:

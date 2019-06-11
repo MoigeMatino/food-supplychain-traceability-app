@@ -132,6 +132,7 @@ asset CommodityShipment identified by gtin {
 
 }
 
+
 /**
  * Transaction to start network to prevent manual entry
  */
