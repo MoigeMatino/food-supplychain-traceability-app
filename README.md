@@ -1,6 +1,6 @@
-# Food Traceability Blockchain - Farm2Table
+# Farm2Table - Food Supplychain Traceability Application
 
-This is a blockchain-based application built with Hyperledger Fabric Composer that enables traceability of food items on the supply chain. The goal of this application is to ensure that consumers can trust the origin and quality of the food they purchase by providing a transparent and immutable record of its journey from **farm to table**.
+This is a blockchain-based application built with Hyperledger Fabric that enables traceability of food items on the supply chain. The goal of this application is to ensure that consumers can trust the origin and quality of the food they purchase by providing a transparent and immutable record of its journey from **farm to table**.
 
 ## How it works
 
